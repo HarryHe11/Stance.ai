@@ -24,17 +24,17 @@ def convert(o):
 
 @app.route("/predict", methods=["GET", "POST"])
 def stancePrediction():
-    
-    if request.method == "POST":
-        form_values = request.form.to_dict()
+    try:
+        if request.method == "POST":
+            form_values = request.form.to_dict()
 
-        sentence = form_values['text']
-        prediction_data = predict(sentence)
-        json_obj = json.dumps(prediction_data, default=convert)
-        return json_obj
-    return "ERROR"
-    # except:
-    #     return json.dumps({"error":"Please Enter Valid Data"}, default=convert)
+            sentence = form_values['text']
+            prediction_data = predict(sentence)
+            json_obj = json.dumps(prediction_data, default=convert)
+            return json_obj
+        return json.dumps({"error":"Please Use POST method"}, default=convert)
+    except:
+        return json.dumps({"error":"Please Enter Valid Data"}, default=convert)
 
 @app.route('/')
 def index():
