@@ -1,8 +1,8 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from flask_cors import CORS, cross_origin
 from flask_pymongo import PyMongo
-from werkzeug.security import generate_password_hash
-from flask_jwt_extended import create_access_token
+from werkzeug.security import generate_password_hash, check_password_hash
+
 
 import json
 import numpy as np
@@ -11,7 +11,6 @@ from predict import predict
 app = Flask(__name__)
 app.config['MONGO_URI'] = 'mongodb://localhost:27017/userDB'
 mongo = PyMongo(app)
-jwt = JWTManager(app)
 
 cors = CORS(app)
 
@@ -53,17 +52,13 @@ def register():
 @app.route('/login', methods=['POST'])
 def login():
     # Parse the JSON data from the request body
-    data = request.json
+    data = request.form.to_dict()
 
     # Find the user in the database
     user = mongo.db.users.find_one({'username': data['username']})
-
     # Check if the user exists and the password is correct
     if user and check_password_hash(user['password'], data['password']):
-        # Generate an access token for the user
-        access_token = create_access_token(identity=user['_id'])
-
-        return jsonify({'access_token': access_token}), 200
+        return jsonify({'message': 'Logged in successfully'}), 200
 
     return jsonify({'error': 'Invalid username or password'}), 401
 
