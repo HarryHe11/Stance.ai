@@ -2,6 +2,7 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch
 import numpy as np
 import json
+import openai
 
 def convert(o):
     if isinstance(o, np.generic):
@@ -32,10 +33,34 @@ def predict(sentence):
     json_obj = json.dumps(prediction_data, default=convert)
     return json_obj
 
+def chatgpt_predict(target, sentence):
+    from dotenv import find_dotenv, load_dotenv
+    import os
 
+    prompt =    "Decide whether a Text's stance on" + target + "is favor, against, or neither.\n" \
+                "Text: "+sentence+"\n" \
+                "Stance:"
+    load_dotenv(find_dotenv('.env'))
+    env_dist = os.environ
+    openai.api_key = env_dist.get('open_ai_api_key')
+
+
+    result = openai.Completion.create(
+                model="text-davinci-003",
+                prompt=prompt,
+                max_tokens=10,
+                temperature=0,)
+
+    result_text = result["choices"][0]["text"].strip().upper()
+    # Map = {'FAVOR': 0, 'AGAINST': 1, 'NEITHER': 2}
+    # predicted_label = Map[result_text]
+    prediction_data = {"label": result_text}
+    json_obj = json.dumps(prediction_data, default=convert)
+    return json_obj
 
 if __name__ == "__main__":
+    target = 'Trump'
     sentence = "MAGA!!!"
-    result = predict(sentence)
+    result = chatgpt_predict(target, sentence)
     print(result)
 

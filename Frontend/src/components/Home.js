@@ -5,7 +5,7 @@ function Home() {
     return (
         <div className="homecontainer">
             <Banner />
-            <Copyright/>
+            <Copyright />
         </div>
     )
 }

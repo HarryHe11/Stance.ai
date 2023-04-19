@@ -52,7 +52,7 @@ function StanceDetection() {
     
     if(predictionResult.label) {
         console.log("Output.....")
-        return <Output predictedStance={predictionResult.label} predictedProbs={predictionResult.probs} clearResult={setPredictionResult}/>;
+        return <Output predictedStance={predictionResult.label} clearResult={setPredictionResult}/>;
     }
 
 

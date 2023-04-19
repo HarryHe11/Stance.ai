@@ -7,7 +7,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import json
 import numpy as np
 
-from predict import predict
+from predict import predict, chatgpt_predict
 app = Flask(__name__)
 app.config['MONGO_URI'] = 'mongodb://localhost:27017/userDB'
 mongo = PyMongo(app)
@@ -67,9 +67,9 @@ def stancePrediction():
     try:
         if request.method == "POST":
             form_values = request.form.to_dict()
-
+            target = form_values['target']
             sentence = form_values['text']
-            prediction_data = predict(sentence)
+            prediction_data = chatgpt_predict(target, sentence)
             json_obj = json.dumps(prediction_data, default=convert)
             return json_obj
         return json.dumps({"error":"Please Use POST method"}, default=convert)
