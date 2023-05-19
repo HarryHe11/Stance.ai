@@ -7,8 +7,4 @@ export const MenuList = [
     title: "Stance Detection",
     url: "/predict",
   },
-  {
-    title: "Visualization",
-    url: "/visual",
-  },
 ];

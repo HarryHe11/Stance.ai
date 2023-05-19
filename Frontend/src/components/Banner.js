@@ -8,14 +8,13 @@ function Banner() {
 
     let history = useHistory()
     
-    const loginRedirect = () => {
-        history.push("/predict")
+    const signInRedirect = () => {
+        history.push("/signin")
     }
 
     const registerRedirect = () => {
-        history.push("/predict") //暂时用predict替代
+        history.push("/signup") //暂时用predict替代
     }
-
 
     return (
         <div className="banner">
@@ -28,10 +27,10 @@ function Banner() {
                         <p>A Machine Learning based Web Application for Stance Detection</p>
                         </div>
 
-                    <div className="banner__buttons">
-                        <Button onClick={loginRedirect} className="banner__button">Login</Button>
-                        <Button onClick={registerRedirect} className="banner__button">Register</Button>
-                    </div>
+                        <div className="banner__buttons">
+                        <Button onClick={registerRedirect} className="banner__button">Sign Up</Button>
+                        <Button onClick={signInRedirect} className="banner__button">Sign In</Button>
+                        </div>
                 </div>  
             </div>
         </div>

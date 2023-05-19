@@ -1,9 +1,9 @@
-import React from 'react';
 import { Button } from '@material-ui/core';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
+import React from 'react';
 // import Table from '@material-ui/core/Table';
 // import TableBody from '@material-ui/core/TableBody';
 // import TableCell from '@material-ui/core/TableCell';
@@ -11,8 +11,8 @@ import Typography from '@material-ui/core/Typography';
 // import TableHead from '@material-ui/core/TableHead';
 // import TableRow from '@material-ui/core/TableRow';
 // import Paper from '@material-ui/core/Paper';
-import "../styles/Output.css"
 import { makeStyles } from '@material-ui/core/styles';
+import "../styles/Output.css";
 
 const useStyles = makeStyles({
     root: {

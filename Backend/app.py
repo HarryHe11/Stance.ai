@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS, cross_origin
 from flask_pymongo import PyMongo
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
@@ -12,7 +13,11 @@ app = Flask(__name__)
 app.config['MONGO_URI'] = 'mongodb://localhost:27017/userDB'
 mongo = PyMongo(app)
 
-cors = CORS(app)
+# 限制只允许特定的域名进行跨域请求
+CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
+
+# 允许特定的HTTP方法进行跨域请求
+CORS(app, resources={r"/*": {"methods": ["GET", "POST"]}})
 
 @app.after_request
 def after_request(response):
@@ -28,53 +33,68 @@ def convert(o):
     raise TypeError
 
 
-@app.route('/register', methods=['POST'])
-def register():
+@app.route('/signup', methods=['POST'])
+def signup():
     # Parse the JSON data from the request body
     data = request.form.to_dict()
 
     # Check if the username already exists in the database
-    if mongo.db.users.find_one({'username': data['username']}):
-        return jsonify({'error': 'Username already exists'}), 400
-
+    if mongo.db.users.find_one({'username': data['userName']}):
+        return jsonify({'message': 'Username already exists'}), 201
     # Generate a hash of the user's password
     password_hash = generate_password_hash(data['password'])
-
     # Insert the new user into the database
     mongo.db.users.insert_one({
-        'username': data['username'],
-        'password': password_hash
+        'username': data['userName'],
+        'email': data['email'],
+        'password': password_hash,
     })
 
-    return jsonify({'message': 'User registered successfully'}), 201
+    return jsonify({'message': 'User registered successfully'}), 200
 
 
-@app.route('/login', methods=['POST'])
-def login():
+@app.route('/signin', methods=['POST'])
+def signin():
     # Parse the JSON data from the request body
     data = request.form.to_dict()
-
     # Find the user in the database
-    user = mongo.db.users.find_one({'username': data['username']})
+    user = mongo.db.users.find_one({'email': data['email']})
     # Check if the user exists and the password is correct
-    if user and check_password_hash(user['password'], data['password']):
-        return jsonify({'message': 'Logged in successfully'}), 200
+    if not user:
+        print('user not found')
+        print(data['email'])
+        return jsonify({'message': 'user not found'}), 201
+    elif user and check_password_hash(user['password'], data['password']):
+        print('success')
+        # access_token = create_access_token(identity=user['_id'])
+        return jsonify({'message': 'success'}), 200
+    elif user and not (check_password_hash(user['password'], data['password'])):
+        print('Invalid username or password')
+        print(data['email'])
+        return jsonify({'message': 'Invalid username or password'}), 201
 
-    return jsonify({'error': 'Invalid username or password'}), 401
 
-@app.route("/predict", methods=["GET", "POST"])
+@app.route("/predict", methods=["POST"])
 def stancePrediction():
-    try:
-        if request.method == "POST":
-            form_values = request.form.to_dict()
-            target = form_values['target']
-            sentence = form_values['text']
-            prediction_data = chatgpt_predict(target, sentence)
-            json_obj = json.dumps(prediction_data, default=convert)
-            return json_obj
-        return json.dumps({"error":"Please Use POST method"}, default=convert)
-    except:
-        return json.dumps({"error":"Please Enter Valid Data"}, default=convert)
+    form_values = request.form.to_dict()
+    #print(form_values)
+    target = form_values['target']
+    sentence = form_values['text']
+    model = form_values['model']
+
+    if model == 'chinese':
+        print("using chinese model")
+        prediction_data = chinese_predict(target, sentence)
+    elif model == 'english':
+        print("using english model")
+        prediction_data = english_predict(target, sentence)
+    elif model == 'chatgpt':
+        print("using chatgpt model")
+        prediction_data = chatgpt_predict(target, sentence)
+    json_obj = json.dumps(prediction_data, default=convert)
+    print(json_obj)
+    return json_obj
+
 
 @app.route('/')
 def index():

@@ -2,7 +2,10 @@ import "./App.css";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import Home from "./components/Home";
 import NavBar from "./components/NavBar";
-import StanceDetection from "./components/StanceDetection";
+import SignIn from "./components/SignIn";
+import SignUp from "./components/SignUp";
+import InputForm from "./components/InputForm";
+import React from "react";
 
 function App() {
   return (
@@ -14,13 +17,9 @@ function App() {
         <NavBar />
         <Switch>
           <Route exact path="/" component={Home} />
-          <Route exact path="/predict" component={StanceDetection} />
-          {/* <Route exact path="/login" component={Login} />
-
-          <Route exact path="/register" component={Register} /> */}
-
-          {/* <Route exact path="/stance" component={StanceDetection} /> */}
-
+          <Route exact path="/predict" component={InputForm} />
+          <Route exact path="/signup" component={SignUp} />
+          <Route exact path="/signin" component={SignIn} />
         </Switch>
       </Router>
       </div>

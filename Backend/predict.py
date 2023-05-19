@@ -37,7 +37,7 @@ def chatgpt_predict(target, sentence):
     from dotenv import find_dotenv, load_dotenv
     import os
 
-    prompt =    "Decide whether a Text's stance on" + target + "is favor, against, or neither.\n" \
+    prompt = "Decide whether a Text's stance on" + target + "is favor, against, or neither.\n" \
                 "Text: "+sentence+"\n" \
                 "Stance:"
     load_dotenv(find_dotenv('.env'))
@@ -51,10 +51,11 @@ def chatgpt_predict(target, sentence):
                 max_tokens=10,
                 temperature=0,)
 
+    print(result)
+
     result_text = result["choices"][0]["text"].strip().upper()
-    # Map = {'FAVOR': 0, 'AGAINST': 1, 'NEITHER': 2}
-    # predicted_label = Map[result_text]
     prediction_data = {"label": result_text}
+    print(prediction_data)
     json_obj = json.dumps(prediction_data, default=convert)
     return json_obj
 
