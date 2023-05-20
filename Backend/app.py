@@ -8,7 +8,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import json
 import numpy as np
 
-from predict import predict, chatgpt_predict
+from predict import predict
 app = Flask(__name__)
 app.config['MONGO_URI'] = 'mongodb://localhost:27017/userDB'
 mongo = PyMongo(app)
@@ -19,13 +19,17 @@ CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 # 允许特定的HTTP方法进行跨域请求
 CORS(app, resources={r"/*": {"methods": ["GET", "POST"]}})
 
+
 @app.after_request
 def after_request(response):
-  response.headers.add('Access-Control-Allow-Origin', '*')
-  response.headers.add("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
-  response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
-  response.headers.add('Access-Control-Allow-Credentials', 'true')
-  return response
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add("Access-Control-Allow-Headers",
+                         "Origin, X-Requested-With, Content-Type, Accept")
+    response.headers.add('Access-Control-Allow-Methods',
+                         'GET,PUT,POST,DELETE,OPTIONS')
+    response.headers.add('Access-Control-Allow-Credentials', 'true')
+    return response
+
 
 def convert(o):
     if isinstance(o, np.generic):
@@ -77,20 +81,15 @@ def signin():
 @app.route("/predict", methods=["POST"])
 def stancePrediction():
     form_values = request.form.to_dict()
-    #print(form_values)
+    # print(form_values)
     target = form_values['target']
-    sentence = form_values['text']
+    text = form_values['text']
     model = form_values['model']
-
     if model == 'chinese':
-        print("using chinese model")
-        prediction_data = chinese_predict(target, sentence)
+        language = 'cn'
     elif model == 'english':
-        print("using english model")
-        prediction_data = english_predict(target, sentence)
-    elif model == 'chatgpt':
-        print("using chatgpt model")
-        prediction_data = chatgpt_predict(target, sentence)
+        language = 'en'
+    prediction_data = predict(target, text, language)
     json_obj = json.dumps(prediction_data, default=convert)
     print(json_obj)
     return json_obj
@@ -99,6 +98,7 @@ def stancePrediction():
 @app.route('/')
 def index():
     return 'Index Page'
+
 
 if __name__ == "__main__":
     app.run(debug=True)

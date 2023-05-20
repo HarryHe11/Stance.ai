@@ -12,13 +12,14 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import api from "../api/stanceAPI"
+import Copyright from "./Copyright";
 
 
 const theme = createTheme();
 
 export default function SignUp() {
-    let history = useHistory()
-    const handleSubmit = async (event) => {
+  let history = useHistory()
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const request = new FormData();
@@ -36,17 +37,17 @@ export default function SignUp() {
         alert('Username already exists!');
       }
       else {
-          alert("An error occurred!");
+        alert("An error occurred!");
       }
     } catch (error) {
       // 处理错误
-        alert('An error occurred:', error);
+      alert('An error occurred:', error);
     }
   };
-    const signInRedirect = () => {
-        history.push("/signin")
+  const signInRedirect = () => {
+    history.push("/signin")
   }
-    return (
+  return (
     <ThemeProvider theme={theme}>
       <Container component="main" maxWidth="sm" >
         <CssBaseline />
@@ -115,6 +116,13 @@ export default function SignUp() {
                 />
               </Grid>
             </Grid>
+             <Grid container justifyContent="flex-end">
+              <Grid item>
+                <Link href="#" variant="body2" onClick={signInRedirect}>
+                  Already have an account? Sign in
+                </Link>
+              </Grid>
+            </Grid>
             <Button
               type="submit"
               fullWidth
@@ -123,16 +131,12 @@ export default function SignUp() {
             >
               Sign Up
             </Button>
-            <Grid container justifyContent="flex-end">
-              <Grid item>
-                <Link href="#" variant="body2" onClick={signInRedirect}>
-                  Already have an account? Sign in
-                </Link>
-              </Grid>
-            </Grid>
+
           </Box>
+          <Copyright />
         </Box>
+
       </Container>
     </ThemeProvider>
-    );
+  );
 }

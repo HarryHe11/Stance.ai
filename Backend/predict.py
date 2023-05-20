@@ -3,6 +3,9 @@ import torch
 import numpy as np
 import json
 import openai
+from models.model import Config, Model
+from getInput import get_model_input
+
 
 def convert(o):
     if isinstance(o, np.generic):
@@ -12,56 +15,38 @@ def convert(o):
 
 # select mode path here
 # see more at https://huggingface.co/kornosk
-def predict(sentence):
-    path = r'models/bert-election2020-twitter-stance-biden-KE-MLM'
+def predict(text, target, language='en'):
+    config = Config(language)
     # load model
-    tokenizer = AutoTokenizer.from_pretrained(path)
-    model = AutoModelForSequenceClassification.from_pretrained(path)
-    print("Model Loaded")
-
+    model = Model(config).to(config.device)
+    # get inputs in a model-acceptable form
+    inputs = get_model_input(text, target, config)
+    # inputs
+    outputs = model(inputs)
+    predicted_probability = torch.softmax(outputs, dim=1)
+    predicted_probability = predicted_probability[0].tolist()
+    print(predicted_probability)
     id2label = {
         0: "FAVOR",
         1: "AGAINST",
-        2: "NONE"
     }
-    ##### Prediction Favor #####
-    inputs = tokenizer(sentence, return_tensors="pt")
-    outputs = model(**inputs)
-    predicted_probability = torch.softmax(outputs[0], dim=1)[0].tolist()
-    predicted_label = id2label[np.argmax(predicted_probability)]
-    prediction_data = {"label": predicted_label, "probs": predicted_probability}
+    max_prob = max(predicted_probability)
+    index = predicted_probability.index(max_prob)
+    predicted_label = id2label[index]
+    probs = {
+        'Favor': predicted_probability[0],
+        'Against': predicted_probability[1]
+    }
+    probs_json_obj = json.dumps(probs, default=convert)
+    prediction_data = {"label": predicted_label,
+                       "max_prob": max_prob, "probs": probs_json_obj}
     json_obj = json.dumps(prediction_data, default=convert)
     return json_obj
 
-def chatgpt_predict(target, sentence):
-    from dotenv import find_dotenv, load_dotenv
-    import os
-
-    prompt = "Decide whether a Text's stance on" + target + "is favor, against, or neither.\n" \
-                "Text: "+sentence+"\n" \
-                "Stance:"
-    load_dotenv(find_dotenv('.env'))
-    env_dist = os.environ
-    openai.api_key = env_dist.get('open_ai_api_key')
-
-
-    result = openai.Completion.create(
-                model="text-davinci-003",
-                prompt=prompt,
-                max_tokens=10,
-                temperature=0,)
-
-    print(result)
-
-    result_text = result["choices"][0]["text"].strip().upper()
-    prediction_data = {"label": result_text}
-    print(prediction_data)
-    json_obj = json.dumps(prediction_data, default=convert)
-    return json_obj
 
 if __name__ == "__main__":
-    target = 'Trump'
-    sentence = "MAGA!!!"
-    result = chatgpt_predict(target, sentence)
+    target = 'Hillary Clinton'
+    sentence = "@HillaryClinton @WomenintheWorld we need to re-establish a #global system dominated by love and affection have #moral_humane RT"
+    #sentence = '城市是发展了，人民是安居乐业了！可是，作为这个城市最为普通的打工者，他们需要电动车，摩托车作为出行工具，去讨生活！再说，什么又是超标电动车呢？既然超标，为什么还要生产！这领导啊，乱治，乱为！为所欲为啊！'
+    result = predict(target, sentence)
     print(result)
-

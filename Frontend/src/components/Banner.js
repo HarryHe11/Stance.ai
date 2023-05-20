@@ -7,7 +7,7 @@ import "../styles/Banner.css"
 function Banner() {
 
     let history = useHistory()
-    
+
     const signInRedirect = () => {
         history.push("/signin")
     }
@@ -25,13 +25,13 @@ function Banner() {
                 <div className="banner__title_tail">
                     <div className="typing">
                         <p>A Machine Learning based Web Application for Stance Detection</p>
-                        </div>
+                    </div>
 
-                        <div className="banner__buttons">
+                    <div className="banner__buttons">
                         <Button onClick={registerRedirect} className="banner__button">Sign Up</Button>
                         <Button onClick={signInRedirect} className="banner__button">Sign In</Button>
-                        </div>
-                </div>  
+                    </div>
+                </div>
             </div>
         </div>
     )
