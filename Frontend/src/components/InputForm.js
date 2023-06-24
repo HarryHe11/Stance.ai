@@ -21,6 +21,7 @@ import { useState } from "react";
 import Loading from "./Loading";
 import ResultDisplay from "./ResultDisplay";
 import Copyright from "./Copyright";
+import localStorage from 'localStorage';
 
 const theme = createTheme();
 
@@ -33,17 +34,16 @@ export default function InputForm() {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const request = new FormData()
+    const user_email = localStorage.getItem('usr_email')
+    request.append('user_email', user_email)
     for (var [key, value] of data.entries()) {
       request.append(key, value);
-
     }
     const response = await api.post(
       "/predict",
       request
     )
     const responseData = JSON.parse(response.data);
-
-
     setPredictionResult(responseData)
     setLoadingStatus(false)
   };

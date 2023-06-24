@@ -16,7 +16,7 @@ export default function ResultDisplay(props) {
     props.clearResult({});
   }
   console.log(props);
-  const displayedData = [{name:'predicted probability',favor:props.probs["Favor"], against:props.probs['Against']}];
+  const displayedData = [{name:'predicted probability',favor:props.probs["Favor"], against:props.probs['Against'], neither:props.probs["Neither"]}];
   console.log(displayedData);
   return (
     <ThemeProvider theme={theme}>

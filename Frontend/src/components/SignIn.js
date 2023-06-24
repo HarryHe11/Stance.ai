@@ -11,6 +11,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import localStorage from 'localStorage';
 import api from "../api/stanceAPI";
 import Copyright from "./Copyright";
 
@@ -27,6 +28,8 @@ export default function SignIn() {
     if (response.status === 200) {
       // 登录成功
       alert('Sign in successfully!');
+      localStorage.setItem('usr_email', data.get('email'));
+      console.log(localStorage.getItem('usr_email'))
       predictRedirect();
     } else if (response.status === 201) {
       // 登录失败

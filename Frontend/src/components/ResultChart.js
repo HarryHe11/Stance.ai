@@ -15,6 +15,7 @@ const ResultChart = ({ data }) => {
        <Legend  />
       <Bar dataKey="favor" fill="green" name="Favor" barCategoryGap='50%'/>
       <Bar dataKey="against" fill="red" name="Against"  barCategoryGap='50%'/>
+      <Bar dataKey="neither" fill="grey" name="Neither"  barCategoryGap='50%'/>
     </BarChart>
   );
 };
