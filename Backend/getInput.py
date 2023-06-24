@@ -1,5 +1,7 @@
 import torch
-
+import nltk
+from ekphrasis.classes.segmenter import Segmenter
+from preprocess import preprocess_text
 
 def input_to_tensor(data, config):
     x = torch.LongTensor([_[0] for _ in data]).to(config.device)
@@ -11,7 +13,11 @@ def input_to_tensor(data, config):
 
 
 def get_model_input(text, target, config):
-    # content = preprocess_text(content,seg)
+    nltk.download("punkt")
+    nltk.download("wordnet")
+    nltk.download("stopwords")
+    seg = Segmenter(corpus="english")
+    text = preprocess_text(text,seg, config.language)
     token = config.tokenizer.tokenize(text)
     seq_len = len(token)
     token_ids = config.tokenizer.convert_tokens_to_ids(token)

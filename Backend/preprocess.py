@@ -63,13 +63,14 @@ def remove_stopwords(text, language):
     return cleaned_text
 
 
-def preprocess_text(text, seg):
+def preprocess_text(text, seg, language):
+
     cleaned_text = remove_html_tags(text)
     cleaned_text = remove_urls(cleaned_text)
     cleaned_text = remove_mentions(cleaned_text)
     restored_text = replace_hashtags(cleaned_text, seg)
     lemmatized_text = lemmatize_words(restored_text)
-    cleaned_text = remove_stopwords(lemmatized_text, "english")
+    cleaned_text = remove_stopwords(lemmatized_text, language)
     return cleaned_text
 
 
@@ -79,4 +80,10 @@ if __name__ == "__main__":
     nltk.download("stopwords")
     seg = Segmenter(corpus="english")
     text = '@HillaryClinton @WomenintheWorld we need to re-establish a #global system dominated by love and affection have #moral_humane RT'
+
+    #text = "很好的手机，性价比高，比国产好的没话说，国产一年一环 苹果用 5 年 8 年没事不卡不迟钝，黑粉们哪个牌子派来的去哪里带着去，有意思吗？不喜欢就不要买，到处乱喷 这就是素质。"
+    #text = '@HillaryClinton @WomenintheWorld we need to re-establish a #global system dominated by love and affection have #moral_humane RT'
+    print("预处理前：")
+    print(text)
+    print("预处理后：")
     print(preprocess_text(text, seg))

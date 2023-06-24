@@ -1,18 +1,21 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS, cross_origin
 from flask_pymongo import PyMongo
+
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
 import json
 import numpy as np
-
+from datetime import datetime
 from predict import predict
+
 app = Flask(__name__)
 app.config['MONGO_URI'] = 'mongodb://localhost:27017/userDB'
-mongo = PyMongo(app)
 
+# 初始化会话对象
+mongo = PyMongo(app)
 # 限制只允许特定的域名进行跨域请求
 CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
@@ -29,7 +32,6 @@ def after_request(response):
                          'GET,PUT,POST,DELETE,OPTIONS')
     response.headers.add('Access-Control-Allow-Credentials', 'true')
     return response
-
 
 def convert(o):
     if isinstance(o, np.generic):
@@ -70,7 +72,6 @@ def signin():
         return jsonify({'message': 'user not found'}), 201
     elif user and check_password_hash(user['password'], data['password']):
         print('success')
-        # access_token = create_access_token(identity=user['_id'])
         return jsonify({'message': 'success'}), 200
     elif user and not (check_password_hash(user['password'], data['password'])):
         print('Invalid username or password')
@@ -81,16 +82,49 @@ def signin():
 @app.route("/predict", methods=["POST"])
 def stancePrediction():
     form_values = request.form.to_dict()
-    # print(form_values)
-    target = form_values['target']
-    text = form_values['text']
+    print(form_values)
     model = form_values['model']
+    user_email = form_values['user_email']
+    user = mongo.db.users.find_one({'email': user_email})
+    user_id =  user['_id']
+    text = form_values['text']
+    target = form_values['target']
+    creation_time = datetime.now()
+
+    mongo.db.historys.insert_one({
+        'userId': user_id,
+        'text': text,
+        'target': target,
+        'creationTime': creation_time
+    })
+
     if model == 'chinese':
         language = 'cn'
     elif model == 'english':
         language = 'en'
-    prediction_data = predict(target, text, language)
+    prediction_data, (stance,probs) = predict(target, text, language)
+
+    data = mongo.db.historys.find_one({'creationTime': creation_time})
+    data_id = data['_id']
+    print(prediction_data)
+    print(stance)
+    print(probs)
+    stance = stance
+    favorConfidence = probs['Favor']
+    againstConfidence= probs['Against']
+    neitherConfidence= probs['Neither']
+
+    mongo.db.results.insert_one({
+        'dataId': data_id,
+        'stance': stance,
+        'favorConfidence': favorConfidence,
+        'againstConfidence': againstConfidence,
+        'neitherConfidence': neitherConfidence,
+    })
+
     json_obj = json.dumps(prediction_data, default=convert)
+
+
     print(json_obj)
     return json_obj
 
