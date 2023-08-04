@@ -1,4 +1,4 @@
-# Stance.ai
+# Stance Detection Web App
  A ML based web application for stance detection.
 
 ## Steps to run the React Application in local
