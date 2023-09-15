@@ -18,7 +18,7 @@ class Config(object):
             self.language = 'chinese'
             self.model_name = 'BERTA_CN'
             self.bert_path = 'bert-base-chinese'
-        self.path = 'D:\南邮\毕业设计\codes\Stance.ai\Backend\models\saved_dict'
+        self.path = '.\Stance.ai\Backend\models\saved_dict'
         self.tokenizer = BertTokenizer.from_pretrained(self.bert_path)
         self.save_path = self.path + '/' + self.model_name + '.ckpt'
         self.class_list = [0, 1, 2]
